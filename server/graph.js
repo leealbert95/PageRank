@@ -1,9 +1,8 @@
-const spawn = require('child_process');
+const spawn = require('child_process').spawn;
 
 const py = spawn('python', ['compute_pagerank.py']);
 
 const Graph = function() {
-  this.idCounter = 0;
   this.size = 0;
   this.links = 0;
   this.pageIdToPos = {}; // Keeps track of each page's position in AdjList
@@ -11,9 +10,20 @@ const Graph = function() {
   this.AdjList = [];
 };
 
-Graph.prototype.populate = function(pageLinks) {
-  
+Graph.prototype.resetConnections = function() {
+  for (let i = 0; i < this.AdjList.length; i++) {
+    this.AdjList[i] = [];
+  }
+  this.links = 0; 
 };
+
+Graph.prototype.wipe = function(clearCache) {
+  this.size = 0;
+  this.links = 0;
+  this.pageIdToPos = {}; // Keeps track of each page's position in AdjList
+  this.AdjList = [];
+  clearCache ? this.pageRankMemo = {} : null;
+}
 
 Graph.prototype.addPage = function(id) {
   if (!id) {
@@ -25,16 +35,29 @@ Graph.prototype.addPage = function(id) {
   return true;
 };
 
-Graph.prototype.createLink = function(from, to) {
-  let indexFrom = this.pageIdToPos[from];
-  let indexTo = this.pageIdToPos[to]; 
-  if (indexFrom === undefined || indexTo === undefined) {
+Graph.prototype.createLink = function(fromId, toId) {
+  if (this.pageIdToPos[fromId] === undefined || this.pageIdToPos[toId] === undefined
+    || fromId === toId) {
     return false;
   }
-  let links = this.AdjList[indexFrom];
-  links.push(indexTo);
+  let fromIndex = this.pageIdToPos[fromId];
+  let links = this.AdjList[fromIndex];
+  links.push(toId);
+  this.links++;
   return true;
 };
+
+Graph.prototype.getLinksFor = function(id) {
+  let index = this.pageIdToPos[id];
+  if (index === undefined) {
+    return;
+  }
+  return this.AdjList[index];
+};
+
+Graph.prototype.getPagePos = function(id) {
+  return this.pageIdToPos[id];
+}
 
 Graph.prototype.calculatePageRank = function(cb) {
   let AdjListToString = JSON.stringify(this.AdjList);
@@ -43,7 +66,10 @@ Graph.prototype.calculatePageRank = function(cb) {
     cb(this.pageRankMemo[AdjListToString]);
     return;
   } 
-  py.stdin.write(JSON.stringify(this.AdjList));
+
+  let AdjListWithIndices = createAdjListWithIndices(this.AdjList, this.pageIdToPos); // Map Id's to positions in array for python script to read
+  
+  py.stdin.write(JSON.stringify(AdjListWithIndices));
   py.stdin.end();
 
   let dataString = '';
@@ -64,4 +90,14 @@ Graph.prototype.calculatePageRank = function(cb) {
     this.pageRankMemo[AdjListToString] = pages;
     cb(pages);
   });
+};
+
+function createAdjListWithIndices(AdjList, pageIdToPos) {
+  return AdjList.map((list) => 
+    list.map((id) => 
+      pageIdToPos(id)
+    )
+  );
 }
+
+module.exports = Graph;
