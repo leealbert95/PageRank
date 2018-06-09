@@ -1,6 +1,4 @@
-const spawn = require('child_process').spawn;
-
-const py = spawn('python', ['compute_pagerank.py']);
+const { spawn } = require('child_process');
 
 const Graph = function() {
   this.size = 0;
@@ -26,7 +24,7 @@ Graph.prototype.wipe = function(clearCache) {
 }
 
 Graph.prototype.addPage = function(id) {
-  if (!id) {
+  if (!id || this.pageIdToPos[id]) {
     return false;
   }
   this.pageIdToPos[id] = this.size;
@@ -42,6 +40,9 @@ Graph.prototype.createLink = function(fromId, toId) {
   }
   let fromIndex = this.pageIdToPos[fromId];
   let links = this.AdjList[fromIndex];
+  if (links.includes(toId)) { // Link already exists
+    return false;
+  }
   links.push(toId);
   this.links++;
   return true;
@@ -69,6 +70,8 @@ Graph.prototype.calculatePageRank = function(cb) {
 
   let AdjListWithIndices = createAdjListWithIndices(this.AdjList, this.pageIdToPos); // Map Id's to positions in array for python script to read
   
+  const py = spawn('python', ['compute_pagerank.py']);
+
   py.stdin.write(JSON.stringify(AdjListWithIndices));
   py.stdin.end();
 
@@ -95,7 +98,7 @@ Graph.prototype.calculatePageRank = function(cb) {
 function createAdjListWithIndices(AdjList, pageIdToPos) {
   return AdjList.map((list) => 
     list.map((id) => 
-      pageIdToPos(id)
+      pageIdToPos[id]
     )
   );
 }
