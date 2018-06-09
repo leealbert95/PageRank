@@ -55,7 +55,7 @@ Graph.prototype.getLinksFor = function(id) {
   return this.AdjList[index];
 };
 
-Graph.prototype.getPagePos = function(id) {
+Graph.prototype.getListPosFor = function(id) {
   return this.pageIdToPos[id];
 }
 
