@@ -1,4 +1,4 @@
-const { spawn } = require('child_process');
+const axios = require('axios');
 
 const Graph = function() {
   this.size = 0;
@@ -48,6 +48,10 @@ Graph.prototype.createLink = function(fromId, toId) {
   return true;
 };
 
+Graph.prototype.showAdjList = function() {
+  return this.AdjList;
+}
+
 Graph.prototype.getLinksFor = function(id) {
   let index = this.pageIdToPos[id];
   if (index === undefined) {
@@ -69,30 +73,31 @@ Graph.prototype.calculatePageRank = function(cb) {
   } 
 
   let AdjListWithIndices = createAdjListWithIndices(this.AdjList, this.pageIdToPos); // Map Id's to positions in array for python script to read
+  console.log(AdjListWithIndices)
+
+  axios.post('http://localhost:5000', AdjListWithIndices)
+    .then((result) => {
+      let sum = result.data.reduce((acc, val) => acc + val)
+      console.log(sum)
+    })
+    .catch((err) => {
+      console.log(err)
+    });
+
+    
+    // let pageRankVector = JSON.parse(dataString);
+    // let pages = [];
+    // Object.keys(this.pageIdToPos).forEach((id) => {
+    //   pages[this.pageIdToPos[id]] = id;
+    // });
+    // pages.sort((id1, id2) => {
+    //   let index1 = this.pageIdToPos[id1];
+    //   let index2 = this.pageIdToPos[id2];
+    //   return pageRankVector[index2] - pageRankVector[index1];
+    // });
+    // this.pageRankMemo[AdjListToString] = pages;
+    // cb(pages);
   
-  const py = spawn('python', ['compute_pagerank.py']);
-
-  py.stdin.write(JSON.stringify(AdjListWithIndices));
-  py.stdin.end();
-
-  let dataString = '';
-  py.stdout.on('data', (data) => {
-    dataString += data;
-  });
-  py.stdout.on('end', () => {
-    let pageRankVector = JSON.parse(dataString);
-    let pages = [];
-    Object.keys(this.pageIdToPos).forEach((id) => {
-      pages[this.pageIdToPos[id]] = id;
-    });
-    pages.sort((id1, id2) => {
-      let index1 = this.pageIdToPos[id1];
-      let index2 = this.pageIdToPos[id2];
-      return pageRankVector[index2] - pageRankVector[index1];
-    });
-    this.pageRankMemo[AdjListToString] = pages;
-    cb(pages);
-  });
 };
 
 function createAdjListWithIndices(AdjList, pageIdToPos) {

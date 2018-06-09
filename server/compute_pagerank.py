@@ -1,4 +1,7 @@
 import sys, json, numpy as np
+from flask import Flask, request
+
+app = Flask(__name__)
 
 def read_in():
   lines = sys.stdin.readlines()
@@ -8,8 +11,12 @@ def create_stochastic(adj_list):
   n = len(adj_list)
   matrix = np.zeros((n, n))
   for col, line in enumerate(adj_list):
-    for index in line:
-      matrix[index][col] = 1/(len(line))
+    if len(line) > 0:
+      for index in line:
+        matrix[index][col] = 1/(len(line))
+    else:
+      for index in range(n):
+        matrix[index][col] = 1/n
   return matrix
 
 def add_damping(stoch_matrix):
@@ -41,16 +48,19 @@ def within_err_bound(v1, v2, err_bound):
       return False
   return True
 
-def main():
-  # adj_list = read_in()
-  adj_list = [[1,3,4],[4],[0,1],[1],[1]]
+@app.route('/', methods=['POST'])
+def post():
+  print('New post')
+  adj_list = request.get_json()
+  print(adj_list)
+  adj_list2 = [[1,3,4],[4],[0,1],[1],[1]]
   stoch_matrix = create_stochastic(adj_list)
   damped_matrix = add_damping(stoch_matrix)
   result = calculate_pagerank(damped_matrix)
   pagerank_vector = result[0]
   iterations = result[1]
-  print(json.dumps(pagerank_vector.tolist()))
-  print(iterations)
+  return json.dumps(pagerank_vector.tolist())
 
 if __name__ == '__main__':
-  main()
+  print('Running python server')
+  app.run(debug=True)
