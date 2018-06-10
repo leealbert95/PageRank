@@ -122,14 +122,11 @@ def create_transitional(stoch_matrix):
   return np.add(part1, part2)
 ```
 
-<p>The transition matrix for this example:</p>
 
 &nbsp; With this transition matrix, we can now multiply it by an initial column vector p where p has length N, and each p[i] has value 1/N
 for a total sum of 1.
 This vector p happens to be the sole eigenvector of the transition matrix with eigenvalue 1. [You can read about eigenvectors and eigenvalues
 here.](https://en.wikipedia.org/wiki/Eigenvalues_and_eigenvectors)
-
-<p></p>
 
 The result
 
