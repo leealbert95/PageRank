@@ -29,7 +29,7 @@ Within the tech industry, variants of the PageRank algorithm remain in use today
 ### The Algorithm Explained
 
 &nbsp; Imagine the World Wide Web consisted of only five webpages. We can visually represent these pages and their links as vertices and 
-edges in a graph:
+edges in a directed graph:
 
 <img src="https://s3.amazonaws.com/albertpersonal/graph.png" width="300" height="250"/>
 
