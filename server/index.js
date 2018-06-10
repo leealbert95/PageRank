@@ -17,5 +17,7 @@ Network.createLink('banana.com', 'apple.com');
 Network.createLink('banana.com', 'orange.com');
 Network.createLink('kiwi.com', 'orange.com');
 Network.createLink('grape.com', 'orange.com');
-console.log(Network.showAdjList());
-Network.calculatePageRank();
+Network.calculatePageRank((sortedPages, iterations, err) => {
+  console.log(sortedPages);
+  console.log(`Calculated in ${iterations} iterations`);
+});

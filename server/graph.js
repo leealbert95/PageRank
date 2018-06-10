@@ -73,31 +73,24 @@ Graph.prototype.calculatePageRank = function(cb) {
   } 
 
   let AdjListWithIndices = createAdjListWithIndices(this.AdjList, this.pageIdToPos); // Map Id's to positions in array for python script to read
-  console.log(AdjListWithIndices)
 
   axios.post('http://localhost:5000', AdjListWithIndices)
     .then((result) => {
-      let sum = result.data.reduce((acc, val) => acc + val)
-      console.log(sum)
+      let { vector: pageRankVector, iterations } = result.data
+      let pages = [];
+      Object.keys(this.pageIdToPos).forEach((id) => {
+        let index = this.pageIdToPos[id]
+        pages[index] = [id, pageRankVector[index]];
+      });
+      pages.sort((page1, page2) => {
+        return page2[1] - page1[1];
+      });
+      this.pageRankMemo[AdjListToString] = pages;
+      cb(pages, iterations);
     })
     .catch((err) => {
-      console.log(err)
+      cb(null, null, err);
     });
-
-    
-    // let pageRankVector = JSON.parse(dataString);
-    // let pages = [];
-    // Object.keys(this.pageIdToPos).forEach((id) => {
-    //   pages[this.pageIdToPos[id]] = id;
-    // });
-    // pages.sort((id1, id2) => {
-    //   let index1 = this.pageIdToPos[id1];
-    //   let index2 = this.pageIdToPos[id2];
-    //   return pageRankVector[index2] - pageRankVector[index1];
-    // });
-    // this.pageRankMemo[AdjListToString] = pages;
-    // cb(pages);
-  
 };
 
 function createAdjListWithIndices(AdjList, pageIdToPos) {

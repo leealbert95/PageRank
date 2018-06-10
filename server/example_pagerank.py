@@ -1,7 +1,4 @@
 import sys, json, numpy as np
-from flask import Flask, request
-
-app = Flask(__name__)
 
 def read_in():
   lines = sys.stdin.readlines()
@@ -25,7 +22,10 @@ def create_transitional(stoch_matrix):
   E = np.ones((n, n)) #create matrix of 1's
   part1 = np.multiply(((1-d)/n), E)
   part2 = np.multiply(d, stoch_matrix)
-  return np.add(part1, part2)
+  transition_matrix = np.add(part1, part2)
+  print(transition_matrix)
+  print('\n')
+  return transition_matrix
 
 def calculate_pagerank(transition_matrix):
   n = len(transition_matrix)
@@ -33,11 +33,16 @@ def calculate_pagerank(transition_matrix):
   v1 = np.full((n, 1), 1/n)
   v2 = np.matmul(transition_matrix, v1)
   count = 1
+  print(v2)
+  print('\n')
   while not within_err_bound(v1, v2, err_bound): 
     #keep iterating multiplication until difference between v1 and v2 for all entries is under err bound
     v1 = v2
     v2 = np.matmul(transition_matrix, v1)
     count += 1
+    print(v2)
+    print('\n')
+  print(count)
   return {'vector': v2.tolist(), 'iterations': count}
 
 def within_err_bound(v1, v2, err_bound):
@@ -47,18 +52,12 @@ def within_err_bound(v1, v2, err_bound):
       return False
   return True
 
-@app.route('/', methods=['POST'])
-def post():
-  print('New post')
-  adj_list = request.get_json()
-  print(adj_list)
-  adj_list2 = [[1,3,4],[4],[0,1],[1],[1]]
+def main():
+  adj_list = [[1],[4],[0,1,3],[],[1]]
   stoch_matrix = create_stochastic(adj_list)
   transition_matrix = create_transitional(stoch_matrix)
-  print(transition_matrix)
   result = calculate_pagerank(transition_matrix)
   return json.dumps(result)
 
 if __name__ == '__main__':
-  print('Running python server')
-  app.run(debug=True)
+  main()
