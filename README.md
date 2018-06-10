@@ -157,7 +157,7 @@ The last vector output in this iterative process is the final pagerank:
 
 <img src="https://s3.amazonaws.com/albertpersonal/final_vector.png" width=100 height=90>
 
-&nbsp; Given this vector, we can see that Page 1 has the highest rank. This is expected because Page 1 has the most inbound links of any page. But notice that Page 4 has a very high rank, too! This is because Page 1 has only one link pointing to Page 4, and transfers all of its weight into that single link, thus drastically increasing the rank of Page 4 in the process. 
+&nbsp; Given this vector, we can see that Page 1 has the highest rank. This is expected because Page 1 has the most inbound links of any page. But notice that Page 4 has a very high rank, too! This is because Page 1 has only one link which points to Page 4, and transfers all of its weight into that single link, thus drastically increasing the rank of Page 4 in the process. 
 
 ### Sources
 https://en.wikipedia.org/wiki/PageRank
