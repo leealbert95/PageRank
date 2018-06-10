@@ -1,10 +1,19 @@
 const axios = require('axios');
+const redis = require('redis');
+const client = redis.createClient();
+
+client.on('error', (err) => {
+  console.log('Could not connect: ', err);
+});
+
+client.on('connect', () => {
+  console.log('Connected to Redis server');
+})
 
 const Graph = function() {
   this.size = 0;
   this.links = 0;
   this.pageIdToPos = {}; // Keeps track of each page's position in AdjList
-  this.pageRankMemo = {}; // Memoize results of each page rank calculation to avoid repetitive calculation
   this.AdjList = [];
 };
 
@@ -15,12 +24,11 @@ Graph.prototype.resetConnections = function() {
   this.links = 0; 
 };
 
-Graph.prototype.wipe = function(clearCache) {
+Graph.prototype.wipe = function() {
   this.size = 0;
   this.links = 0;
   this.pageIdToPos = {}; // Keeps track of each page's position in AdjList
   this.AdjList = [];
-  clearCache ? this.pageRankMemo = {} : null;
 }
 
 Graph.prototype.addPage = function(id) {
@@ -62,31 +70,33 @@ Graph.prototype.getListPosFor = function(id) {
 
 Graph.prototype.calculatePageRank = function(cb) {
   let AdjListToString = JSON.stringify(this.AdjList);
-  if (this.pageRankMemo[AdjListToString]) { 
-    // Have already calculated pagerank for this adjacency list
-    cb(this.pageRankMemo[AdjListToString]);
-    return;
-  } 
-
-  let AdjListWithIndices = createAdjListWithIndices(this.AdjList, this.pageIdToPos); // Map Id's to positions in array for python script to read
-
-  axios.post('http://localhost:5000', AdjListWithIndices)
-    .then((result) => {
-      let { vector: pageRankVector, iterations } = result.data
-      let pages = [];
-      Object.keys(this.pageIdToPos).forEach((id) => {
-        let index = this.pageIdToPos[id]
-        pages[index] = [id, pageRankVector[index]];
+  client.get(AdjListToString, (err, data) => {
+    if (data) {
+      let { pageOrder, iterations } = data
+      cb(pageOrder, iterations);
+      return;
+    }
+    let AdjListWithIndices = createAdjListWithIndices(this.AdjList, this.pageIdToPos); // Map Id's to positions in array for python script to read
+    
+    axios.post('http://localhost:5000', AdjListWithIndices)
+      .then((result) => {
+        let { vector: pageRankVector, iterations } = result.data
+        let pageOrder = [];
+        Object.keys(this.pageIdToPos).forEach((id) => {
+          let index = this.pageIdToPos[id];
+          pageOrder[index] = [id, pageRankVector[index]];
+        });
+        pageOrder.sort((page1, page2) => {
+          return page2[1] - page1[1];
+        });
+        let data = {pageOrder: pageOrder, iterations: iterations}
+        client.set(AdjListToString, data);
+        cb(pageOrder, iterations);
+      })
+      .catch((err) => {
+        cb(null, null, err);
       });
-      pages.sort((page1, page2) => {
-        return page2[1] - page1[1];
-      });
-      this.pageRankMemo[AdjListToString] = pages;
-      cb(pages, iterations);
-    })
-    .catch((err) => {
-      cb(null, null, err);
-    });
+  });
 };
 
 function createAdjListWithIndices(AdjList, pageIdToPos) {

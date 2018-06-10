@@ -49,16 +49,12 @@ def within_err_bound(v1, v2, err_bound):
 
 @app.route('/', methods=['POST'])
 def post():
-  print('New post')
   adj_list = request.get_json()
-  print(adj_list)
   adj_list2 = [[1,3,4],[4],[0,1],[1],[1]]
   stoch_matrix = create_stochastic(adj_list)
   transition_matrix = create_transitional(stoch_matrix)
-  print(transition_matrix)
   result = calculate_pagerank(transition_matrix)
   return json.dumps(result)
 
 if __name__ == '__main__':
-  print('Running python server')
   app.run(debug=True)
