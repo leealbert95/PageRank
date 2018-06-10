@@ -24,7 +24,7 @@ Graph.prototype.wipe = function(clearCache) {
 }
 
 Graph.prototype.addPage = function(id) {
-  if (!id || this.pageIdToPos[id]) {
+  if (!id || this.pageIdToPos[id] !== undefined) {
     return false;
   }
   this.pageIdToPos[id] = this.size;
@@ -47,10 +47,6 @@ Graph.prototype.createLink = function(fromId, toId) {
   this.links++;
   return true;
 };
-
-Graph.prototype.showAdjList = function() {
-  return this.AdjList;
-}
 
 Graph.prototype.getLinksFor = function(id) {
   let index = this.pageIdToPos[id];

@@ -21,7 +21,7 @@ describe('Testing Graph', () => {
     expect(testGraph.pageIdToPos).toHaveProperty('bar', 1);
   });
 
-  test('Should not be able to add same page twice', () => {
+  test('Should not be able to add same page more than once', () => {
     testGraph.addPage('foo');
     testGraph.addPage('foo');
     testGraph.addPage('foo');
@@ -56,7 +56,7 @@ describe('Testing Graph', () => {
 
   test('Should not be able to link a page to itself', () => {
     testGraph.addPage('foo');
-    testGraph.addPage('foo', 'foo');
+    testGraph.createLink('foo', 'foo');
     let fooLinks = testGraph.getLinksFor('foo');
 
     expect(fooLinks).toHaveLength(0);
