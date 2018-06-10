@@ -112,7 +112,10 @@ def create_transitional(stoch_matrix):
   E = np.ones((n, n)) #create matrix of 1's
   part1 = np.multiply(((1-d)/n), E)
   part2 = np.multiply(d, stoch_matrix)
-  return np.add(part1, part2)
+  transition_matrix = np.add(part1, part2)
+  print(transition_matrix)
+  print('\n')
+  return transition_matrix
 ```
 The resulting output for this example:
 
@@ -137,11 +140,15 @@ def calculate_pagerank(transition_matrix):
   v1 = np.multiply((1/n), v1)
   v2 = np.matmul(transition_matrix, v1)
   count = 1
+  print(v2)
+  print('\n')
   while not within_err_bound(v1, v2, err_bound): 
     #keep iterating multiplication until difference between v1 and v2 for all entries is under err bound
     v1 = v2
     v2 = np.matmul(transition_matrix, v1)
     count += 1
+    print(v2)
+    print('\n')
   return {'vector': v2.tolist(), 'iterations': count}
 
 def within_err_bound(v1, v2, err_bound):
