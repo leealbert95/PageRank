@@ -121,7 +121,8 @@ def create_transitional(stoch_matrix):
   part2 = np.multiply(d, stoch_matrix)
   return np.add(part1, part2)
 ```
-
+The transition matrix for this example:\s\s
+![alt text](https://s3.amazonaws.com/albertpersonal/transition_matrix.png)
 
 &nbsp; With this transition matrix, we can now multiply it by an initial column vector p where p has length N, and each p[i] has value 1/N
 for a total sum of 1.
