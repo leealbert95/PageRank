@@ -68,7 +68,7 @@ entries of each column add up to 1, so this matrix is column-stochastic. This ty
 &nbsp; You may be wondering why column 3 has 0.2 for all its entries, even though Page 3 has no outgoing links! This is because in 
 the PageRank algorithm, a page with no outgoing links is assumed to equally distribute its importance among all the existing pages in the network. Effectively, this is the same as saying that the page has links to every page in the network, including itself. The justification for this reasoning is that, using the web surfer model, a user who visits a page with no outbound links will type the url of any of the existing webpages with equal probability. In this example, since there are five pages total in the network, a user on page 3 will have a 1/5 chance of visiting any of the other pages, hence the 0.2.
 
-&nbsp; Here is a snippet of my Python code that creates the stochastic matrix (To save computational time I create the stochastic matrix directly from the adjacency list. I use Python's NumPy library for all matrix operations):
+&nbsp; To save computational time, I create the stochastic matrix directly from the adjacency list. I also use Python's NumPy library for all matrix operations (You can see the full example code at server/example_pagerank.py). Here is the function in my Python code that creates the stochastic matrix.:
 
 ```python
 def create_stochastic(adj_list):
