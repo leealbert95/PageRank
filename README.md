@@ -63,7 +63,7 @@ From this, we can create the stochastic matrix:
  [0, 1, 0.00, 0.2, 0]]
 ```
 &nbsp; What is a stochastic matrix? It is a matrix in which either all the entries of each row or column add up to 1. In this case, the
-entries of each column vector add up to 1, so this matrix is column-stochastic. This type of matrix represents a probability distribution, in which each matrix[i][j] represents the probability that a web surfer who is currently on page j will visit page i.
+entries of each column add up to 1, so this matrix is column-stochastic. This type of matrix represents a probability distribution, in which each matrix[i][j] represents the probability that a web surfer who is currently on page j will visit page i.
 
 &nbsp; You may be wondering why column 3 has 0.2 for all its entries, even though Page 3 has no outgoing links! This is because in 
 the PageRank algorithm, a page with no outgoing links is assumed to equally distribute its importance among all the existing pages in the network. Effectively, this is the same as saying that the page has links to every page in the network, including itself. The justification for this reasoning is that, using the web surfer model, a user who visits a page with no outbound links will type the url of any of the existing webpages with equal probability. In this example, since there are five pages total in the network, a user on page 3 will have a 1/5 chance of visiting any of the other pages, hence the 0.2.
@@ -88,7 +88,7 @@ def create_stochastic(adj_list):
 
 &nbsp; After we create the stochastic matrix, we must now consider the damping factor. According to Page and Brin, the PageRank problem
 assumes that at some point, the user will grow bored and eventually stop clicking. The damping factor is a constant between 0 and 1, and
-represents the probability that the user will continue clicking at any moment. In their paper, Page and Brin use a damping factor of 0.85, which is what I use in my implementation, too. 
+represents the probability that the user will continue clicking at any moment. In their paper, Page and Brin used a damping factor of 0.85, which is what I use in my implementation, too. 
 [Here's a good explanation about the purpose of the damping factor.](https://www.quora.com/What-is-the-function-of-the-damping-factor-in-PageRank)
 
 The pagerank calculation of any page is as follows:
@@ -152,8 +152,7 @@ def within_err_bound(v1, v2, err_bound):
   return True
 ```
 
-&nbsp; You can see the part of the console output for this example [here](https://s3.amazonaws.com/albertpersonal/iterations.png), since it's a bit too long to fit on this page. Even in the first few iterations, you can see the values changing by a smaller amount each time. This particular example takes 22 iterations until the differences fall below the error bound.
-
+&nbsp; You can see the part of the console output for this example [here](https://s3.amazonaws.com/albertpersonal/iterations.png), since it's a bit too long to fit on this page. Even in the first few iterations, you can see the values changing by a smaller amount each time. This particular example takes 22 iterations until the differences fall below the error bound. 
 The last vector output in this iterative process is the final pagerank:
 
 <img src="https://s3.amazonaws.com/albertpersonal/final_vector.png" width=100 height=90>
