@@ -50,7 +50,6 @@ def within_err_bound(v1, v2, err_bound):
 @app.route('/', methods=['POST'])
 def post():
   adj_list = request.get_json()
-  adj_list2 = [[1,3,4],[4],[0,1],[1],[1]]
   stoch_matrix = create_stochastic(adj_list)
   transition_matrix = create_transitional(stoch_matrix)
   result = calculate_pagerank(transition_matrix)
