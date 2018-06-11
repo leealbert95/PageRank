@@ -1,14 +1,8 @@
 # PageRank
-A simple implementation of Google's PageRank algorithm. Uses NodeJS server to store the adjacency list state and Python to calculate
-the rank of each page.
+A simple implementation of Google's PageRank algorithm. Uses NodeJS server to store the adjacency list state and Python to calculate the rank of each page.
 
 ### What is PageRank?
-&nbsp; Whenever you do a Google search, and you see the results appear on the page, do you ever wonder how/why the results are 
-ordered the way they are? This is, in part, due to Google's PageRank algorithm! The algorithm, to put it simply, analyzes the number 
-of incoming links to each page on the web, and assigns each page a rank determined by the rank of each page linking to it. 
-PageRank follows a probabilistic model of a web surfer, who visits a certain page, and then clicks a link on that page
-at random. In essence, the rank of each page represents the probability that any web surfer will land on it. Although it is
-conceptually simple, PageRank is widely considered to be one of the most important algorithms ever invented in the tech industry.
+&nbsp; Whenever you do a Google search, and you see the results appear on the page, do you ever wonder how/why the results are ordered the way they are? This is, in part, due to Google's PageRank algorithm! The algorithm, to put it simply, analyzes the number of incoming links to each page on the web, and assigns each page a rank determined by the rank of each page linking to it. PageRank follows a probabilistic model of a web surfer, who visits a certain page, and then clicks a link on that page at random. In essence, the rank of each page represents the probability that any web surfer will land on it. Although it is conceptually simple, PageRank is widely considered to be one of the most important algorithms ever invented in the tech industry.
 
 ### The History of PageRank
 &nbsp; Although PageRank is popularly associated with Larry Page and Sergey Brin, the founders of Google, an early version of the
@@ -28,8 +22,9 @@ Within the tech industry, variants of the PageRank algorithm remain in use today
 
 ### The Algorithm Explained
 
-&nbsp; Imagine the World Wide Web consisted of only five webpages. We can visually represent these pages and their links as vertices and 
-edges in a directed graph:
+&nbsp; Let's start by visualizing the World Wide Web as a series of vertices and edges in a directed graph. Each vertex represents a webpage, and each edge represents a link from that page to another. Each edge also carries a weight which is influenced by its origin page's rank.
+
+For this example, imagine the World Wide Web has only five pages, with their links shown below:
 
 <img src="https://s3.amazonaws.com/albertpersonal/graph.png" width="300" height="250"/>
 
@@ -66,7 +61,7 @@ From this, we can create the stochastic matrix:
 entries of each column add up to 1, so this matrix is column-stochastic. This type of matrix represents a probability distribution, in which each matrix[i][j] represents the probability that a web surfer who is currently on page j will visit page i.
 
 &nbsp; You may be wondering why column 3 has 0.2 for all its entries, even though Page 3 has no outgoing links! This is because in 
-the PageRank algorithm, a page with no outgoing links is assumed to equally distribute its importance among all the existing pages in the network. Effectively, this is the same as saying that the page has links to every page in the network, including itself. The justification for this reasoning is that, using the web surfer model, a user who visits a page with no outbound links will type the url of any of the existing webpages with equal probability. In this example, since there are five pages total in the network, a user on page 3 will have a 1/5 chance of visiting any of the other pages, hence the 0.2.
+the PageRank algorithm, a page with no outgoing links is assumed to equally distribute its importance among all the existing pages in the network. Effectively, this is the same as saying that the page has links to every page in the network, including itself. The justification for this reasoning is that, using the web surfer model, a user who visits a page with no outbound links will type the url of any of the existing webpages with equal probability. In this example, since there are five pages total in the network, a user on Page 3 will have a 1/5 chance of visiting any of the other pages, hence the 0.2.
 
 &nbsp; To save computational time, I create the stochastic matrix directly from the adjacency list. I also use Python's NumPy library for all matrix operations (You can see the full example code at server/example_pagerank.py). Here is the function in my Python code that creates the stochastic matrix.:
 
@@ -164,7 +159,21 @@ The last vector output in this iterative process is the final pagerank:
 
 <img src="https://s3.amazonaws.com/albertpersonal/final_vector.png" width=100 height=90>
 
-&nbsp; Given this vector, we can see that Page 1 has the highest rank. This is expected because Page 1 has the most inbound links of any page. But notice that Page 4 has a very high rank, too, despite having only one inbound link! This is because this single inbound link comes from Page 1, which happens to be the most important page. Since this link is Page 1's sole outbound link, Page 1 transfers all of its influence through this single link. Remember that not only does the amount of inbound links matter when calculating the rank of a page, but so does the weight of each link!
+&nbsp; Given this vector, we can see that Page 1 has the highest rank. This is expected because Page 1 has the most inbound links of any page. But notice that Page 4 has a very high rank, too, despite having only one inbound link! This is because this single inbound link comes from Page 1, which happens to be the most important page. Since this link is Page 1's sole outbound link, Page 1 transfers all of its influence through it (If you were a prospective applicant looking for a new job, one recommendation from Larry Page himself would be more impactful than ten recommendations from your coworkers!). Remember that not only does the amount of inbound links matter, but so does the weight of each link!
+
+### The Downsides of PageRank 
+
+&nbsp; Though PageRank is a brilliant algorithm for ranking webpages, it is not an entirely reliable method by itself due to its many weaknesses. Here are a few reasons:
+
+#### Bias Towards Older Pages
+&nbsp; Since pages that are indexed earlier in the network will have likely accumulated more inbound links than newly registered pages, these older pages will have higher PageRanks than the newer ones. This is problematic for search engines because many users look for newer content (searching news articles for a certain topic, for example). Newer pages will be obscured by the older, more established ones, and the algorithm may yield an inaccurate result for a query. 
+
+#### Link Farms
+
+&nbsp; A link farm is a group of websites that link to every other site in the group. Doing so helps increase the PageRank of all the member pages of the group. This artificial inflation of member pages' PageRanks allows the entity that owns the link farm to generate higher revenue from advertising on the pages. Google did target private blog networks in September 2014 with manual action ranking penalties. Link farms constitute a form of spamdexing, which is the deliberate manipulation of search engine indexing. 
+
+#### Spoofing
+&nbsp; The PageRank shown in the Google Toolbar was easily manipulable, because redirection from one page to another via a HTTP 302 response would cause the original page to gain the PageRank of the redirected page. By redirecting to a well-known website, any page could thus acquire a large PageRank. This technique is known as spoofing. In March 2016, Google pulled the PageRank feature from the Toolbar, and shut down the API.
 
 ### Sources
 https://en.wikipedia.org/wiki/PageRank
@@ -174,3 +183,5 @@ https://arxiv.org/pdf/1407.5107v1.pdf
 http://home.ie.cuhk.edu.hk/~wkshum/papers/pagerank.pdf
 
 http://www.stat.cmu.edu/~ryantibs/datamining/lectures/03-pr.pdf
+
+https://en.wikipedia.org/wiki/Link_farm
