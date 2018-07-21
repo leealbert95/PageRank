@@ -3,10 +3,6 @@ from flask import Flask, request
 
 app = Flask(__name__)
 
-def read_in():
-  lines = sys.stdin.readlines()
-  return json.loads(lines[0])
-
 def create_stochastic(adj_list):
   n = len(adj_list)
   matrix = np.zeros((n, n))

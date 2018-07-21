@@ -1,6 +1,8 @@
 # PageRank
 A simple implementation of Google's PageRank algorithm. Uses NodeJS server to store the adjacency list state and Python to calculate the rank of each page.
 
+DISCLAIMER: I do not claim to be an expert in PageRank, its use cases, etc. This is a project that I pursued for fun to see the PageRank algorithm in action. This README is intended as a cursory discussion about the history of PageRank, the algorithm itself, and its pros and cons. 
+
 ### What is PageRank?
 &nbsp; Whenever you do a Google search, and you see the results appear on the page, do you ever wonder how/why the results are ordered the way they are? This is, in part, due to Google's PageRank algorithm! The algorithm, to put it simply, analyzes the number of incoming links to each page on the web, and assigns each page a rank determined by the rank of each page linking to it. PageRank follows a probabilistic model of a web surfer, who visits a certain page, and then clicks a link on that page at random. In essence, the rank of each page represents the probability that any web surfer will land on it. Although it is conceptually simple, PageRank is widely considered to be one of the most important algorithms ever invented in the tech industry.
 

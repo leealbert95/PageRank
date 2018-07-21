@@ -1,9 +1,5 @@
 import sys, json, numpy as np
 
-def read_in():
-  lines = sys.stdin.readlines()
-  return json.loads(lines[0])
-
 def create_stochastic(adj_list):
   n = len(adj_list)
   matrix = np.zeros((n, n))
